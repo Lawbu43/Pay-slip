@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payslip Generator - Ultimax Security</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 10px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .logo {
+            display: none;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            max-width: 180px;
+            height: auto;
+            border-radius: 0;
+            box-shadow: none;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .welcome {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .welcome h2 {
+            color: #007bff;
+        }
+        .start-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        .start-btn:hover {
+            background-color: #0056b3;
+        }
+        form {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #payslip, #form-section, #storage-section {
+            display: none;
+            border: 1px solid #ddd;
+            padding: 20px;
+            background-color: #fafafa;
+            border-radius: 4px;
+        }
+        .annual-summary {
+            background: #e8f5e8;
+            border: 1px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .annual-total {
+            font-size: 18px;
+            color: #28a745;
+            margin: 5px 0;
+        }
+        .section {
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 10px;
+            background-color: white;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .total {
+            font-weight: bold;
+            border-top: 2px solid #007bff;
+            padding-top: 10px;
+            color: #007bff;
+        }
+        .print-btn, .save-btn, .load-btn, .clear-btn, .search-btn {
+            background-color: #28a745;
+            margin: 5px;
+        }
+        .save-btn:hover, .load-btn:hover, .clear-btn:hover, .search-btn:hover {
+            background-color: #218838;
+        }
+        .payslip-list {
+            margin-top: 10px;
+        }
+        .payslip-item {
+            cursor: pointer;
+            padding: 5px;
+            border: 1px solid #ddd;
+            margin: 5px 0;
+            background: white;
+        }
+        .payslip-item:hover {
+            background: #f0f0f0;
+        }
+        .section h3 {
+            color: #28a745;
+            margin-top: 0;
+            border-bottom: 2px solid #28a745;
+            padding-bottom: 5px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+        .search-form {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .signature-section {
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        .signature-label {
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .signature-pad {
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            width: 250px;
+            height: 80px;
+            background: #fff;
+            cursor: crosshair;
+        }
+        .signature-actions {
+            margin-top: 5px;
+            display: flex;
+            gap: 10px;
+        }
+        .signature-image {
+            margin-top: 8px;
+            max-width: 250px;
+            max-height: 80px;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            background: #fff;
+        }
+        @media (max-width: 600px) {
+            .container { padding: 10px; }
+            .row { flex-direction: column; align-items: flex-start; }
+            .welcome { padding: 20px 10px; }
+            .signature-section { align-items: stretch; }
+        }
+        @media print {
+            body { margin: 0; padding: 0; background-color: white; font-size: 10pt; }
+            .container { max-width: none; width: 100%; padding: 5px; box-shadow: none; border-radius: 0; }
+            .welcome, #form-section, #storage-section, button:not(.print-btn), .signature-actions { display: none !important; }
+            #payslip { display: block !important; border: none; padding: 5px; background-color: white; page-break-after: avoid; }
+            .row { font-size: 9pt; margin-bottom: 3px; flex-direction: row !important; }
+            .section h3 { font-size: 11pt; margin: 5px 0; border-bottom: 1px solid #000; color: #000; }
+            .total { border-top: 2px solid #000; padding-top: 5px; color: #000; }
+            .logo-print { display: block !important; text-align: center; margin-bottom: 20px; }
+            .logo-print img { max-width: 180px; border-radius: 0; box-shadow: none; }
+            .logo { display: none !important; }
+            .section { border: 1px solid #000; padding: 8px; margin-bottom: 10px; background-color: #f9f9f9; }
+            .annual-summary { border: 1px solid #000; background: #f9f9f9; }
+            .annual-total { color: #000; font-size: 12pt; }
+            .footer { border-top: 1px solid #000; color: #000; font-size: 8pt; }
+            .signature-section { display: flex !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Payslip Generator</h1>
+
+        <div class="welcome" id="welcome">
+            <h2>Welcome to Ultimax Security Payslip Generator</h2>
+            <p>Generate your payslip securely and efficiently.</p>
+            <button class="start-btn" onclick="startGenerator()">Start Generating Payslip</button>
+        </div>
+
+        <div id="form-section">
+            <form id="payslipForm">
+                <label for="employeeName">Employee Name:</label>
+                <input type="text" id="employeeName" required>
+
+                <label for="employeeId">Employee ID:</label>
+                <input type="text" id="employeeId" required>
+
+                <label for="department">Department:</label>
+                <input type="text" id="department" required>
+
+                <label for="payPeriod">Pay Period (e.g., Jan 2025):</label>
+                <input type="text" id="payPeriod" required>
+
+                <label for="hourlyRate">Hourly Rate:</label>
+                <input type="number" id="hourlyRate" step="0.01" value="0">
+
+                <label for="hoursWorked">Hours Worked:</label>
+                <input type="number" id="hoursWorked" step="0.01" value="0">
+
+                <label for="basicSalary">Basic Salary (or override):</label>
+                <input type="number" id="basicSalary" step="0.01" required>
+
+                <label for="allowance">Allowance (e.g., HRA, Bonus):</label>
+                <input type="number" id="allowance" step="0.01" value="0">
+
+                <label for="housing">Housing Deduction:</label>
+                <input type="number" id="housing" step="0.01" value="0">
+
+                <label for="nasfun">NASFUN Deduction:</label>
+                <input type="number" id="nasfun" step="0.01" value="0">
+
+                <label for="other">Other Deduction:</label>
+                <input type="number" id="other" step="0.01" value="0">
+
+                <label for="insurance">Insurance Deduction:</label>
+                <input type="number" id="insurance" step="0.01" value="0">
+
+                <button type="submit">Generate Payslip</button>
+            </form>
+        </div>
+
+        <div id="storage-section">
+            <h3>Saved Payslips</h3>
+            <form class="search-form" id="searchForm">
+                <label for="fromDate">From Date (YYYY-MM):</label>
+                <input type="month" id="fromDate">
+
+                <label for="toDate">To Date (YYYY-MM):</label>
+                <input type="month" id="toDate">
+
+                <button type="submit" class="search-btn">Search</button>
+                <button type="button" onclick="clearSearch()">Clear Search</button>
+            </form>
+            <div id="payslip-list" class="payslip-list"></div>
+            <button class="clear-btn" onclick="clearStorage()">Clear All</button>
+            <button class="load-btn" onclick="showForm()">Back to Form</button>
+        </div>
+
+        <div id="payslip">
+            <!-- Logo only for print -->
+            <div class="logo-print" style="display:none;">
+                <img src="ULTIMAX_FINAL LOGO (White Circle).png" alt="Ultimax Security Logo">
+            </div>
+            <div class="section">
+                <div class="row">
+                    <strong>Company:</strong>
+                    <span>Ultimax Security</span>
+                </div>
+                <div class="row">
+                    <strong>Employee Name:</strong>
+                    <span id="displayName"></span>
+                </div>
+                <div class="row">
+                    <strong>Employee ID:</strong>
+                    <span id="displayId"></span>
+                </div>
+                <div class="row">
+                    <strong>Department:</strong>
+                    <span id="displayDept"></span>
+                </div>
+                <div class="row">
+                    <strong>Pay Period:</strong>
+                    <span id="displayPeriod"></span>
+                </div>
+                <div class="row">
+                    <strong>Hourly Rate:</strong>
+                    <span id="displayHourly"></span>
+                </div>
+                <div class="row">
+                    <strong>Hours Worked:</strong>
+                    <span id="displayHours"></span>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Earnings</h3>
+                <div class="row">
+                    <span>Basic Salary:</span>
+                    <span id="displayBasic"></span>
+                </div>
+                <div class="row">
+                    <span>Allowance:</span>
+                    <span id="displayAllowance"></span>
+                </div>
+                <div class="row total">
+                    <strong>Gross Pay:</strong>
+                    <strong id="displayGross"></strong>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Deductions</h3>
+                <div class="row">
+                    <span>Housing:</span>
+                    <span id="displayHousing"></span>
+                </div>
+                <div class="row">
+                    <span>NASFUN:</span>
+                    <span id="displayNASFUN"></span>
+                </div>
+                <div class="row">
+                    <span>Other:</span>
+                    <span id="displayOther"></span>
+                </div>
+                <div class="row">
+                    <span>Insurance:</span>
+                    <span id="displayInsurance"></span>
+                </div>
+                <div class="row total">
+                    <strong>Total Deductions:</strong>
+                    <strong id="displayTotalDeductions"></strong>
+                </div>
+            </div>
+
+            <div class="row total">
+                <strong>Net Pay:</strong>
+                <strong id="displayNet"></strong>
+            </div>
+
+            <div class="annual-summary" id="annualSummary" style="display: none;">
+                <h3>Annual Summary</h3>
+                <div class="annual-total" id="annualGross">Annual Gross: K 0.00</div>
+                <div class="annual-total" id="annualDeductions">Annual Deductions: K 0.00</div>
+                <div class="annual-total" id="annualNet">Annual Net: K 0.00</div>
+            </div>
+
+            <div class="signature-section" id="signatureSection">
+                <span class="signature-label">Finance Manager Signature:</span>
+                <canvas id="signaturePad" class="signature-pad"></canvas>
+                <div class="signature-actions">
+                    <button type="button" onclick="clearSignature()">Clear</button>
+                    <button type="button" onclick="saveSignature()">Save Signature</button>
+                </div>
+                <img id="signatureImage" class="signature-image" style="display:none;" alt="Digital Signature">
+            </div>
+
+            <div class="footer">
+                <p>&copy; 2025 Ultimax Security. All Rights Reserved.</p>
+            </div>
+
+            <button class="save-btn" onclick="savePayslip()">Save Payslip</button>
+            <button class="print-btn" onclick="window.print()">Print Payslip</button>
+            <button class="load-btn" onclick="showStorage()">View Saved</button>
+        </div>
+    </div>
+
+    <script>
+        let currentPayslip = null;
+        let savedPayslips = [];
+        let filteredList = [];
+
+        function startGenerator() {
+            document.getElementById('welcome').style.display = 'none';
+            document.getElementById('form-section').style.display = 'block';
+            loadSavedList();
+        }
+
+        function showStorage() {
+            document.getElementById('payslip').style.display = 'none';
+            document.getElementById('storage-section').style.display = 'block';
+            loadSavedList();
+        }
+
+        function showForm() {
+            document.getElementById('storage-section').style.display = 'none';
+            document.getElementById('form-section').style.display = 'block';
+        }
+
+        function savePayslip() {
+            if (!currentPayslip) return;
+            savedPayslips.push(currentPayslip);
+            localStorage.setItem('payslips', JSON.stringify(savedPayslips));
+            alert('Payslip saved!');
+            loadSavedList();
+        }
+
+        function loadSavedList(fromDate = '', toDate = '') {
+            savedPayslips = JSON.parse(localStorage.getItem('payslips') || '[]');
+            filteredList = savedPayslips.filter(p => {
+                const periodDate = new Date(p.period + '-01');
+                const fromMatch = !fromDate || periodDate >= new Date(fromDate + '-01');
+                const toMatch = !toDate || periodDate <= new Date(toDate + '-01');
+                return fromMatch && toMatch;
+            });
+            const list = document.getElementById('payslip-list');
+            list.innerHTML = '';
+            filteredList.forEach((p, index) => {
+                const item = document.createElement('div');
+                item.className = 'payslip-item';
+                item.textContent = `${p.name} - ${p.period}`;
+                item.onclick = () => loadPayslip(index);
+                list.appendChild(item);
+            });
+            if (filteredList.length > 0) {
+                calculateAnnual();
+                document.getElementById('annualSummary').style.display = 'block';
+            } else {
+                document.getElementById('annualSummary').style.display = 'none';
+            }
+        }
+
+        function loadPayslip(index) {
+            currentPayslip = filteredList[index];
+            displayPayslip(currentPayslip);
+            document.getElementById('storage-section').style.display = 'none';
+            document.getElementById('payslip').style.display = 'block';
+            calculateAnnual();
+        }
+
+        function clearStorage() {
+            if (confirm('Clear all saved payslips?')) {
+                localStorage.removeItem('payslips');
+                savedPayslips = [];
+                loadSavedList();
+                document.getElementById('annualSummary').style.display = 'none';
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('fromDate').value = '';
+            document.getElementById('toDate').value = '';
+            loadSavedList();
+        }
+
+        function calculateAnnual() {
+            if (filteredList.length === 0) return;
+            const grossTotal = filteredList.reduce((sum, p) => sum + parseFloat(p.gross.replace(/[K,]/g, '')), 0);
+            const deductionsTotal = filteredList.reduce((sum, p) => sum + parseFloat(p.totalDeductions.replace(/[K,]/g, '')), 0);
+            const netTotal = filteredList.reduce((sum, p) => sum + parseFloat(p.net.replace(/[K,]/g, '')), 0);
+
+            function formatCurrency(amount) {
+                return 'K ' + new Intl.NumberFormat('en-PG').format(amount);
+            }
+
+            document.getElementById('annualGross').textContent = 'Annual Gross: ' + formatCurrency(grossTotal);
+            document.getElementById('annualDeductions').textContent = 'Annual Deductions: ' + formatCurrency(deductionsTotal);
+            document.getElementById('annualNet').textContent = 'Annual Net: ' + formatCurrency(netTotal);
+        }
+
+        function displayPayslip(data) {
+            document.getElementById('displayName').textContent = data.name;
+            document.getElementById('displayId').textContent = data.id;
+            document.getElementById('displayDept').textContent = data.dept;
+            document.getElementById('displayPeriod').textContent = data.period;
+            document.getElementById('displayHourly').textContent = data.hourlyRate;
+            document.getElementById('displayHours').textContent = data.hoursWorked + ' hours';
+            document.getElementById('displayBasic').textContent = data.basic;
+            document.getElementById('displayAllowance').textContent = data.allowance;
+            document.getElementById('displayGross').textContent = data.gross;
+            document.getElementById('displayHousing').textContent = data.housing;
+            document.getElementById('displayNASFUN').textContent = data.nasfun;
+            document.getElementById('displayOther').textContent = data.other;
+            document.getElementById('displayInsurance').textContent = data.insurance;
+            document.getElementById('displayTotalDeductions').textContent = data.totalDeductions;
+            document.getElementById('displayNet').textContent = data.net;
+        }
+
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+            loadSavedList(fromDate, toDate);
+        });
+
+        document.getElementById('payslipForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('employeeName').value;
+            const id = document.getElementById('employeeId').value;
+            const dept = document.getElementById('department').value;
+            const period = document.getElementById('payPeriod').value;
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value);
+            const hoursWorked = parseFloat(document.getElementById('hoursWorked').value);
+            let basic = parseFloat(document.getElementById('basicSalary').value);
+            if (hourlyRate > 0 && hoursWorked > 0) {
+                basic = hourlyRate * hoursWorked;
+                document.getElementById('basicSalary').value = basic;
+            }
+            const allowance = parseFloat(document.getElementById('allowance').value);
+            const housing = parseFloat(document.getElementById('housing').value);
+            const nasfun = parseFloat(document.getElementById('nasfun').value);
+            const other = parseFloat(document.getElementById('other').value);
+            const insurance = parseFloat(document.getElementById('insurance').value);
+
+            const gross = basic + allowance;
+            const totalDeductions = housing + nasfun + other + insurance;
+            const net = gross - totalDeductions;
+
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('en-PG', { style: 'currency', currency: 'PGK' }).format(amount);
+            }
+
+            currentPayslip = {
+                name, id, dept, period,
+                hourlyRate: formatCurrency(hourlyRate),
+                hoursWorked,
+                basic: formatCurrency(basic),
+                allowance: formatCurrency(allowance),
+                gross: formatCurrency(gross),
+                housing: formatCurrency(housing),
+                nasfun: formatCurrency(nasfun),
+                other: formatCurrency(other),
+                insurance: formatCurrency(insurance),
+                totalDeductions: formatCurrency(totalDeductions),
+                net: formatCurrency(net)
+            };
+
+            displayPayslip(currentPayslip);
+            savedPayslips.push(currentPayslip);
+            localStorage.setItem('payslips', JSON.stringify(savedPayslips));
+
+            document.getElementById('form-section').style.display = 'none';
+            document.getElementById('payslip').style.display = 'block';
+            document.getElementById('payslip').scrollIntoView({ behavior: 'smooth' });
+            calculateAnnual();
+        });
+
+        // Digital Signature Pad
+        const canvas = document.getElementById('signaturePad');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        canvas.addEventListener('mousedown', (e) => {
+            drawing = true;
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+        });
+        canvas.addEventListener('mousemove', (e) => {
+            if (drawing) {
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.stroke();
+            }
+        });
+        canvas.addEventListener('mouseup', () => {
+            drawing = false;
+        });
+        canvas.addEventListener('mouseleave', () => {
+            drawing = false;
+        });
+
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            document.getElementById('signatureImage').style.display = 'none';
+        }
+
+        function saveSignature() {
+            const dataURL = canvas.toDataURL();
+            document.getElementById('signatureImage').src = dataURL;
+            document.getElementById('signatureImage').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
